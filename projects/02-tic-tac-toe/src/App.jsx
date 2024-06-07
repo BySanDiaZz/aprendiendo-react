@@ -1,68 +1,29 @@
 import './App.css'
 import { Children, useState } from 'react'
+import confetti from 'canvas-confetti'
+import { Square } from './components/Square'
+import { TURNS } from './constans' 
+import { checkWinnerFrom, checkEndGame } from './logic/board'
+import { WinnerModal } from './components/WinnerModal'
+import { saveGameToStorage, resetGameFromStorage } from './storage'
 
-const TURNS = {
-  X: 'x',
-  O: 'o'
-}
-
-const Square =  ({ children, isSelected, updateBoard, index }) => {
-
-  //aplicar estilos al turno actual
-  const className = `square ${isSelected ? 'is-selected' : ''}`;
-
-  const handleClick = () => {
-    //actualizar celda en el tablero
-    updateBoard(index)
-  }
-
-  return (
-    //renderizar Square
-    <div onClick={handleClick} className={className}>
-      {children}
-    </div>
-  )
-}
-
-const WINNER_COMBOS = [
-  [0,1,2],
-  [3,4,5],
-  [6,7,8],
-  [0,3,6],
-  [1,4,7],
-  [2,5,8],
-  [0,4,8],
-  [2,4,6]
-]
 
 function App() {
 
-  const [board, setBoard] = useState(
-    //crear array del tablero
-    Array(9).fill(null)
-  )
+  //crear array del tablero
+  const [board, setBoard] = useState( () => {
+    const boardFromStorage = window.localStorage.getItem('board')
+    return boardFromStorage ? JSON.parse(boardFromStorage) : Array(9).fill(null)
+  })
   
   //setear primer turno
-  const [turn, setTurn] = useState(TURNS.X)
+  const [turn, setTurn] = useState( () => {
+    const turnFromStorage = window.localStorage.getItem('turn')
+    return turnFromStorage ? JSON.parse(turnFromStorage) : TURNS.X
+  })
 
   //setear ganador
   const [winner, setWinner] = useState(null)
-
-  //revisar si hay ganador
-  const checkWinner =  (boardtoCheck) => {
-    for(const combo of WINNER_COMBOS){
-      const [a,b,c] = combo
-      if(
-        boardtoCheck[a] &&
-        boardtoCheck[a] === boardtoCheck[b] &&
-        boardtoCheck[a] === boardtoCheck[c]
-      ){
-        return boardtoCheck[a]
-      }
-    }
-    //no hay ganador
-    return null 
-  }
 
   const updateBoard = (index) => {
     //no actualizar si ya hay algo en la celda
@@ -77,12 +38,26 @@ function App() {
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
     setTurn(newTurn)
 
+    //guardar partida
+    saveGameToStorage(newBoard, newTurn)
+
     //revisar si hay ganador
-    const newWinner = checkWinner(newBoard)
+    const newWinner = checkWinnerFrom(newBoard)
     if(newWinner){
+      confetti()
       setWinner(newWinner)
-      alert(`El ganador es ${newWinner}`)
+    } 
+    else if (checkEndGame(newBoard)) {
+      setWinner(false)
     }
+  }
+
+  //resetear juego
+  const resetGame = () => {
+    setBoard(Array(9).fill(null))
+    setTurn(TURNS.X)
+    setWinner(null)
+    resetGameFromStorage()
   }
 
   return (
@@ -92,7 +67,7 @@ function App() {
 
       <section className="game">
         {
-          board.map((_,index) => {
+          board.map((square,index) => {
             return (
               <Square 
                 key={index}
@@ -114,6 +89,14 @@ function App() {
           {TURNS.O}
         </Square>
       </section>
+
+      <section>
+        <footer>
+          <button onClick={resetGame}>Empezar de nuevo</button>
+        </footer>
+      </section>
+
+      <WinnerModal resetGame={resetGame} winner={winner}/>
 
     </main>
   )
