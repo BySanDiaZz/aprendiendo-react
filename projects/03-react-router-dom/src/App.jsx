@@ -1,34 +1,47 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { BrowserRouter, Link, Route } from 'react-router-dom'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const inlineStyles = {
+  padding: 5
+}
+
+const Home = () => <h1>Home</h1>
+const Notes = () => <h1>Notes</h1>
+const Users = () => <h1>Users</h1>
+
+const App = () => {
+
+  const [page, toPage] = useState(() => {
+    const { pathname } = window.location
+    const page = pathname.slice(1)
+    return page
+  }) 
+
+  const getContent = () => {
+    if (page === 'users'){
+      return <Users />
+    }else if (page === 'notes'){
+      return <Notes />
+    }else{
+      return <Home />
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+      <header>
+        <Link to='/home' onClick={toPage('home')} style={inlineStyles}>
+          Home
+        </Link>
+        <Link to='/notes' onClick={toPage('notes')} style={inlineStyles}>
+          Notes
+        </Link>
+        <Link to='/users' onClick={toPage('users')} style={inlineStyles}>
+          Users
+        </Link>
+      </header>
+    </BrowserRouter>
   )
 }
 
