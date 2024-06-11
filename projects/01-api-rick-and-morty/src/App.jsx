@@ -22,6 +22,7 @@ function App() {
             
             <Characters
               characters={characters}
+              setCharacters={setCharacters}
             />
 
           ) : (

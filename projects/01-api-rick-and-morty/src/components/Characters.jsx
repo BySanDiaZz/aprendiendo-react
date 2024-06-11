@@ -1,8 +1,10 @@
 export const Characters = ({...props}) => {
 
-  const { characters } = props
+  const { characters, setCharacters } = props
 
-  console.log(characters)
+  const resetCharacters = () => {
+    setCharacters(null)
+  }
 
   return (
     <div className="characters">
@@ -46,7 +48,7 @@ export const Characters = ({...props}) => {
           ))
         }
       </div>
-      <button className="back-home">Volver al Home</button>
+      <button className="back-home" onClick={resetCharacters}>Volver al Home</button>
     </div>
   )
 }
