@@ -1,13 +1,12 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import './App.css'
+import { Home } from './components/Home'
+import { Notes } from './components/Notes'
+import { Users } from './components/Users'
 
 const inlineStyles = {
   padding: 5
 }
-
-const Home = () => <h1>Home</h1>
-const Notes = () => <h1>Notes</h1>
-const Users = () => <h1>Users</h1>
 
 const App = () => {
 
@@ -27,22 +26,8 @@ const App = () => {
       </header>
 
       <Routes>
-        <Route
-          path='/'
-          element={
-            <Home/>
-          }
-        >
-        </Route>
-
-        <Route
-          path='/notes'
-          element={
-            <Notes/>
-          }
-        >
-        </Route>
-
+        <Route path='/'element={ <Home/> } />
+        <Route path='/notes'element={ <Notes/> } />
         <Route path='/users' element={ <Users/> } />
       </Routes>
       
